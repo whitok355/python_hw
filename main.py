@@ -1,68 +1,107 @@
-# Задача 34:  Винни-Пух попросил Вас посмотреть, есть ли в его стихах ритм. 
-# Поскольку разобраться в его кричалках не настолько просто, насколько легко он их придумывает, 
-# Вам стоит написать программу. Винни-Пух считает, что ритм есть, 
-# если число слогов (т.е. число гласных букв) в каждой фразе стихотворения одинаковое. 
-# Фраза может состоять из одного слова, если во фразе несколько слов, то они разделяются дефисами.
-# Фразы отделяются друг от друга пробелами. Стихотворение  Винни-Пух вбивает в программу с клавиатуры. 
-# В ответе напишите “Парам пам-пам”, если с ритмом все в порядке и “Пам парам”, если с ритмом все не в порядке
+# Задача 38: Дополнить телефонный справочник возможностью изменения и удаления данных. 
+# Пользователь также может ввести имя или фамилию, и Вы должны реализовать функционал для изменения и удаления данных
+import re
 
-# *Пример:*
+def checkName (value) :
+    return re.match(r'[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(?:\s+[А-ЯЁ][а-яё]+)?', value)
 
-# **Ввод:** пара-ра-рам рам-пам-папам па-ра-па-да    
-#     **Вывод:** Парам пам-пам
-# arr = {
-#     "а": "гласная", "б": "согласная", "в": "согласная", "г": "согласная", "д": "согласная", "е": "гласная", "ё": "гласная","ж": "согласная","з" : "согласная", "и":"гласная","й":"согласная","к":"согласная","л":"согласная","м":"согласная","н":"согласная","о":"гласная","п":"согласная","р":"согласная","с":"согласная","т":"согласная","у":"гласная","ф":"согласная","х":"согласная","ц":"согласная","ч":"согласная","ш":"согласная", "щ":"согласная", "ъ":"согласная","ы":"гласная","ь":"согласная","э":"гласная","ю":"гласная","я":"гласная",
-# }
+def checkPhone(value) :
+    return re.match(r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$', value)
 
-# enterValue = str(input("Введите фразу: "))
+def exp() :
+    flagName = True
+    while flagName :
+        name = str(input("Введите ФИО: "))
+        if checkName(name):
+            flagName = False
+            flagNumber = True
+            while flagNumber :
+                number = str(input("Введите номер телефона: "))
+                if checkPhone(number) :
+                    with open('./telephone directoryю.txt', 'a', encoding='utf-8') as inData :
+                        inData.write(f" {name.strip()} : {number.strip()} \n")
+                        flagNumber = False
+                        print("Запись успешно добавлена")
+                else:
+                    print("Введите корректный номер телефона")
+        else :
+            print("Введите корректное ФИО")
+   
+def imp() :
+    with open('./telephone directoryю.txt', 'r', encoding='utf-8') as outData :
+        data = outData.read().splitlines()
+        for user in data :
+            print(user)
 
-# def calc(symbCount) :
-#     res = False
-#     for i in range(len(symbCount[:-1])) :
-#         if(symbCount[i]== symbCount[i+1]):
-#             res = True
-#         else :
-#             return False
-#     return res   
+def change (param):
+    flag_name = True
+    flag_phone = True
+    with open ('./telephone directoryю.txt', 'r', encoding='utf-8') as file:
+        old_data = file.read().splitlines()
+        for i in range(len(old_data)) :
+            user_name = old_data[i].split(':')[0] 
+            if user_name.lower().strip() == param.lower().strip():
+                while flag_name:   
+                    new_name = input("Введите новое ФИО ")
+                    if checkName(new_name):
+                        flag_name = False
+                        while flag_phone :
+                            new_number = input("Введите новый номер ")
+                            if checkPhone(new_number) :
+                                flag_phone = False
+                                new_str = f"{new_name} : {new_number}"
+                                old_data[i] = new_str
+                                new_data = "\n".join(old_data)
+                                with open('./telephone directoryю.txt', 'w', encoding='utf-8') as data:
+                                    data.write(new_data)
+                                    return True
+                            else :
+                                print("Введите корректный номер телефона")
+            else :
+                print("Введите кооректное значение. ФИО состоит из 3 значений, каждое значение начинается с заглавной буквы и написано кириллицей")
 
-# def scan (value, arrSymbols) :
-#     arrSumm = []
-#     for phrase in value.split() :
-#         sum = 0
-#         for symbol in phrase:
-#             if(arrSymbols[symbol] == "гласная"):
-#                 sum += 1
-#         arrSumm.append(sum)
-#     return calc(arrSumm)
-
-# if scan(enterValue, arr) :
-#     print("Парам пам-пам")
-# else:
-#     print("Пам парам")
+def delete(param):
+    with open('./telephone directoryю.txt', 'r', encoding='utf-8') as read_data:
+        old_data = read_data.read().splitlines()
+        for i in range(len(old_data)) :
+            user_name = old_data[i].split(':')[0]
+            if user_name.lower().strip() == param.lower().strip():
+                old_data.pop(i)
+                new_data = "\n".join(old_data)
+                with open('./telephone directoryю.txt', 'w', encoding='utf-8') as write_data:
+                    write_data.write(new_data)
+                    return True
 
 
-# Задача 36: Напишите функцию print_operation_table(operation, num_rows=6, num_columns=6), 
-# которая принимает в качестве аргумента функцию, вычисляющую элемент по номеру строки и столбца. 
-# Аргументы num_rows и num_columns указывают число строк и столбцов таблицы, которые должны быть распечатаны. 
-# Нумерация строк и столбцов идет с единицы (подумайте, почему не с нуля). 
-# Примечание: бинарной операцией называется любая операция, у которой ровно два аргумента, как, например, у операции умножения.
+operation = int(input("Введите желаемую операцию 1- экспорт, 2- импорт, 3 изменение, 4 -удаление "))
 
-# *Пример:*
-
-# **Ввод:** `print_operation_table(lambda x, y: x * y) ` 
-# **Вывод:**
-# 1 2 3 4 5 6
-
-# 2 4 6 8 10 12
-# 3 6 9 12 15 18
-# 4 8 12 16 20 24
-# 5 10 15 20 25 30
-# 6 12 18 24 30 36
-
-# def print_operation_table(operation,num_rows,num_columns):   
-#     for i in range(1,num_rows+1):
-#         print()
-#         for j in range(1,num_columns+1):
-#             print(operation(i,j), end="   ")
-
-# print_operation_table(lambda x, y: x * y,6,6)
+if operation == 1:
+    exp()
+elif operation == 2:
+    imp()
+elif operation == 3:
+    flag_change = True
+    while flag_change :
+        name = str(input("Укажите ФИО пользователя по которму производится изменение "))
+        if checkName(name) :
+            if change(name):
+                print("Изменения сохранены")
+            else :
+                print("У тебя руки из, что то тут не работает")
+            flag_change = False
+        else :
+            print("Введите вкооректное значение. ФИО состоит из 3 значений, каждое значение начинается с заглавной буквы и написано кириллицей")
+elif operation == 4 :
+    flag_del = True
+    while flag_del :
+        name = str(input("Укажите ФИО пользователя по которму производится изменение "))
+        if checkName(name) :
+            if delete(name):
+                print("Запись удалена")
+            else :
+                print("Данный пользователь не найден")
+            flag_change = False
+        else :
+            print("Введите вкооректное значение. ФИО состоит из 3 значений, каждое значение начинается с заглавной буквы и написано кириллицей")
+else :
+    print("Вы ввели невалидное значение")
